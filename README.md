@@ -313,9 +313,17 @@ docker run -d \
 
 ### 生产环境部署
 
-#### 1. 域名与 SSL 配置
+#### 1. 反向代理配置
 
-使用 Nginx 作为反向代理：
+##### 端口说明
+
+本项目使用以下端口：
+- **8080**: HTTP 服务器主端口（管理后台、API、Webhook）
+- **8443**: Webhook 专用端口（仅在 webhook 模式下使用）
+
+##### Nginx 反向代理配置
+
+**轮询模式（Polling Mode）配置：**
 
 ```nginx
 server {
@@ -331,7 +339,8 @@ server {
     ssl_certificate /etc/letsencrypt/live/bot.yourdomain.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bot.yourdomain.com/privkey.pem;
 
-    location / {
+    # 管理后台
+    location /admin {
         proxy_pass http://localhost:8080;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -339,15 +348,248 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    location /webhook {
-        proxy_pass http://localhost:8080/webhook;
+    # API 接口
+    location /api {
+        proxy_pass http://localhost:8080;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # 支付回调
+    location /callback {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # 静态资源
+    location /static {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_cache_valid 200 1h;
+        proxy_cache_key $uri$is_args$args;
+    }
+
+    # 指标监控
+    location /metrics {
+        proxy_pass http://localhost:8080;
+        # 建议添加 IP 白名单
+        allow 10.0.0.0/8;
+        allow 172.16.0.0/12;
+        allow 192.168.0.0/16;
+        deny all;
     }
 }
 ```
 
-#### 2. Systemd 服务配置
+**Webhook 模式配置（推荐）：**
+
+```nginx
+server {
+    listen 80;
+    server_name bot.yourdomain.com;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name bot.yourdomain.com;
+
+    ssl_certificate /etc/letsencrypt/live/bot.yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/bot.yourdomain.com/privkey.pem;
+
+    # Telegram Webhook 接收端点（重要）
+    location /webhook {
+        proxy_pass http://localhost:8080/webhook;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # Telegram 服务器 IP 白名单（可选但推荐）
+        # 参考: https://core.telegram.org/bots/webhooks#the-good-the-bad-and-the-ugly
+        allow 149.154.160.0/20;
+        allow 91.108.4.0/22;
+        allow 91.108.8.0/21;
+        allow 91.108.16.0/21;
+        allow 91.108.56.0/22;
+        allow 2001:b28:f23c::/47;
+        allow 2001:b28:f23f::/48;
+        allow 2001:67c:4e8::/48;
+        allow 2001:b28:f23d::/48;
+        allow 2001:b28:f242::/48;
+        deny all;
+    }
+
+    # 管理后台
+    location /admin {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # 可选：添加 Basic Auth 额外保护
+        # auth_basic "Admin Area";
+        # auth_basic_user_file /etc/nginx/.htpasswd;
+    }
+
+    # API 接口
+    location /api {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # 支付回调（重要）
+    location /callback {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # 其他所有请求
+    location / {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+##### Apache 反向代理配置
+
+如果使用 Apache 作为反向代理：
+
+```apache
+<VirtualHost *:80>
+    ServerName bot.yourdomain.com
+    Redirect permanent / https://bot.yourdomain.com/
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName bot.yourdomain.com
+
+    SSLEngine on
+    SSLCertificateFile /etc/letsencrypt/live/bot.yourdomain.com/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/bot.yourdomain.com/privkey.pem
+
+    ProxyPreserveHost On
+    ProxyRequests Off
+
+    # Webhook 端点
+    ProxyPass /webhook http://localhost:8080/webhook
+    ProxyPassReverse /webhook http://localhost:8080/webhook
+
+    # 管理后台
+    ProxyPass /admin http://localhost:8080/admin
+    ProxyPassReverse /admin http://localhost:8080/admin
+
+    # API 和其他
+    ProxyPass / http://localhost:8080/
+    ProxyPassReverse / http://localhost:8080/
+</VirtualHost>
+```
+
+##### Caddy 反向代理配置
+
+使用 Caddy（自动 HTTPS）：
+
+```caddyfile
+bot.yourdomain.com {
+    # Webhook 端点
+    handle /webhook* {
+        reverse_proxy localhost:8080
+        
+        # Telegram IP 白名单
+        @telegram_ips {
+            remote_ip 149.154.160.0/20 91.108.4.0/22 91.108.8.0/21 91.108.16.0/21 91.108.56.0/22
+        }
+        handle @telegram_ips {
+            reverse_proxy localhost:8080
+        }
+        respond 403
+    }
+
+    # 管理后台（可选认证）
+    handle /admin* {
+        # basicauth {
+        #     admin $2a$14$YourHashedPassword
+        # }
+        reverse_proxy localhost:8080
+    }
+
+    # 其他所有请求
+    handle {
+        reverse_proxy localhost:8080
+    }
+}
+```
+
+#### 2. 防火墙配置
+
+确保以下端口开放：
+- **443/tcp**: HTTPS（必需）
+- **80/tcp**: HTTP（用于重定向到 HTTPS）
+- **8080/tcp**: 仅本地访问（不要对外开放）
+
+使用 UFW：
+```bash
+# 允许 HTTPS
+sudo ufw allow 443/tcp
+
+# 允许 HTTP（用于重定向）
+sudo ufw allow 80/tcp
+
+# 确保 8080 端口不对外开放
+sudo ufw deny 8080/tcp
+
+# 启用防火墙
+sudo ufw enable
+```
+
+使用 firewalld：
+```bash
+# 允许 HTTPS
+sudo firewall-cmd --permanent --add-service=https
+
+# 允许 HTTP
+sudo firewall-cmd --permanent --add-service=http
+
+# 重载配置
+sudo firewall-cmd --reload
+```
+
+#### 3. 域名与 SSL 配置
+
+使用 Let's Encrypt 获取免费 SSL 证书：
+
+```bash
+# 安装 Certbot
+sudo apt-get update
+sudo apt-get install certbot python3-certbot-nginx
+
+# 获取证书（Nginx）
+sudo certbot --nginx -d bot.yourdomain.com
+
+# 或手动获取证书
+sudo certbot certonly --standalone -d bot.yourdomain.com
+
+# 设置自动续期
+sudo certbot renew --dry-run
+```
+
+#### 4. Systemd 服务配置
 
 创建 `/etc/systemd/system/shopbot.service`：
 
@@ -386,7 +628,14 @@ systemctl start shopbot
 systemctl status shopbot
 ```
 
-#### 3. 设置 Telegram Webhook
+#### 5. 设置 Telegram Webhook
+
+**重要提示：** Webhook 模式需要满足以下条件：
+1. 必须使用 HTTPS（443 端口）
+2. 需要有效的 SSL 证书（自签名证书不被接受）
+3. 域名必须公网可访问
+
+设置 Webhook：
 
 ```bash
 curl -F "url=https://bot.yourdomain.com/webhook" \
