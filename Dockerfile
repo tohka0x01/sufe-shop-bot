@@ -53,8 +53,5 @@ EXPOSE 7832
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:7832/healthz || exit 1
 
-# Set environment variables
-ENV CONFIG_PATH=/app/config.yaml
-
 # Run the application
 CMD ["/app/shopbot"]
