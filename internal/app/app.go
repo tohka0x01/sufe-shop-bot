@@ -112,7 +112,7 @@ func (app *Application) Start(ctx context.Context) error {
 func (app *Application) startHTTPServer(ctx context.Context) {
 	router := app.setupRouter()
 	
-	addr := ":8080"
+	addr := fmt.Sprintf(":%d", app.Config.Port)
 	if app.Config.UseWebhook && app.Config.WebhookPort > 0 {
 		addr = fmt.Sprintf(":%d", app.Config.WebhookPort)
 	}

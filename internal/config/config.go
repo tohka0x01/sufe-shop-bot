@@ -27,12 +27,15 @@ type Config struct {
 	EpayPID     string `envconfig:"EPAY_PID" default:""`
 	EpayKey     string `envconfig:"EPAY_KEY" default:""`
 	EpayGateway string `envconfig:"EPAY_GATEWAY" default:""`
-	BaseURL     string `envconfig:"BASE_URL" default:"http://localhost:8080"`
+	BaseURL     string `envconfig:"BASE_URL" default:"http://localhost:7832"`
 	
 	// Webhook configuration
 	UseWebhook  bool   `envconfig:"USE_WEBHOOK" default:"false"`
 	WebhookURL  string `envconfig:"WEBHOOK_URL"`
-	WebhookPort int    `envconfig:"WEBHOOK_PORT" default:"8443"`
+	WebhookPort int    `envconfig:"WEBHOOK_PORT" default:"9147"`
+	
+	// HTTP Server configuration
+	Port        int    `envconfig:"PORT" default:"7832"`
 	
 	// Redis configuration - individual fields
 	RedisHost     string `envconfig:"REDIS_HOST" default:"localhost"`

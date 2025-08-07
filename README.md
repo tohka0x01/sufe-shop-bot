@@ -86,7 +86,7 @@ redis:
 
 # HTTP 服务器配置
 server:
-  port: 8080
+  port: 7832
   admin_username: "admin"
   admin_password: "secure_password"
 
@@ -148,7 +148,7 @@ go run cmd/server/main.go
 
 4. **访问管理后台**
 
-打开浏览器访问 `http://localhost:8080/admin`，使用配置文件中的管理员账号登录。
+打开浏览器访问 `http://localhost:7832/admin`，使用配置文件中的管理员账号登录。
 
 ### Docker 部署
 
@@ -196,7 +196,7 @@ services:
       - ./templates:/app/templates
       - ./static:/app/static
     ports:
-      - "8080:8080"
+      - "7832:7832"
     networks:
       - shopbot-net
     restart: unless-stopped
@@ -226,7 +226,7 @@ redis:
   url: "redis://:redis_password@redis:6379/0"
 
 server:
-  port: 8080
+  port: 7832
   admin_username: "admin"
   admin_password: "your_secure_admin_password"
 
@@ -304,7 +304,7 @@ docker run -d \
 docker run -d \
   --name shopbot-app \
   --network shopbot-net \
-  -p 8080:8080 \
+  -p 7832:7832 \
   -v $(pwd)/config.yaml:/app/config.yaml \
   -v $(pwd)/templates:/app/templates \
   -v $(pwd)/static:/app/static \
@@ -318,8 +318,8 @@ docker run -d \
 ##### 端口说明
 
 本项目使用以下端口：
-- **8080**: HTTP 服务器主端口（管理后台、API、Webhook）
-- **8443**: Webhook 专用端口（仅在 webhook 模式下使用）
+- **7832**: HTTP 服务器主端口（管理后台、API、Webhook）
+- **9147**: Webhook 专用端口（仅在 webhook 模式下使用）
 
 ##### Nginx 反向代理配置
 
@@ -341,7 +341,7 @@ server {
 
     # 管理后台
     location /admin {
-        proxy_pass http://localhost:8080;
+        proxy_pass http://localhost:7832;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -350,7 +350,7 @@ server {
 
     # API 接口
     location /api {
-        proxy_pass http://localhost:8080;
+        proxy_pass http://localhost:7832;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -359,7 +359,7 @@ server {
 
     # 支付回调
     location /callback {
-        proxy_pass http://localhost:8080;
+        proxy_pass http://localhost:7832;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -368,7 +368,7 @@ server {
 
     # 静态资源
     location /static {
-        proxy_pass http://localhost:8080;
+        proxy_pass http://localhost:7832;
         proxy_set_header Host $host;
         proxy_cache_valid 200 1h;
         proxy_cache_key $uri$is_args$args;
@@ -376,7 +376,7 @@ server {
 
     # 指标监控
     location /metrics {
-        proxy_pass http://localhost:8080;
+        proxy_pass http://localhost:7832;
         # 建议添加 IP 白名单
         allow 10.0.0.0/8;
         allow 172.16.0.0/12;
@@ -404,7 +404,7 @@ server {
 
     # Telegram Webhook 接收端点（重要）
     location /webhook {
-        proxy_pass http://localhost:8080/webhook;
+        proxy_pass http://localhost:7832/webhook;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -427,7 +427,7 @@ server {
 
     # 管理后台
     location /admin {
-        proxy_pass http://localhost:8080;
+        proxy_pass http://localhost:7832;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -440,7 +440,7 @@ server {
 
     # API 接口
     location /api {
-        proxy_pass http://localhost:8080;
+        proxy_pass http://localhost:7832;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -449,7 +449,7 @@ server {
 
     # 支付回调（重要）
     location /callback {
-        proxy_pass http://localhost:8080;
+        proxy_pass http://localhost:7832;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -458,7 +458,7 @@ server {
 
     # 其他所有请求
     location / {
-        proxy_pass http://localhost:8080;
+        proxy_pass http://localhost:7832;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -488,16 +488,16 @@ server {
     ProxyRequests Off
 
     # Webhook 端点
-    ProxyPass /webhook http://localhost:8080/webhook
-    ProxyPassReverse /webhook http://localhost:8080/webhook
+    ProxyPass /webhook http://localhost:7832/webhook
+    ProxyPassReverse /webhook http://localhost:7832/webhook
 
     # 管理后台
-    ProxyPass /admin http://localhost:8080/admin
-    ProxyPassReverse /admin http://localhost:8080/admin
+    ProxyPass /admin http://localhost:7832/admin
+    ProxyPassReverse /admin http://localhost:7832/admin
 
     # API 和其他
-    ProxyPass / http://localhost:8080/
-    ProxyPassReverse / http://localhost:8080/
+    ProxyPass / http://localhost:7832/
+    ProxyPassReverse / http://localhost:7832/
 </VirtualHost>
 ```
 
@@ -509,14 +509,14 @@ server {
 bot.yourdomain.com {
     # Webhook 端点
     handle /webhook* {
-        reverse_proxy localhost:8080
+        reverse_proxy localhost:7832
         
         # Telegram IP 白名单
         @telegram_ips {
             remote_ip 149.154.160.0/20 91.108.4.0/22 91.108.8.0/21 91.108.16.0/21 91.108.56.0/22
         }
         handle @telegram_ips {
-            reverse_proxy localhost:8080
+            reverse_proxy localhost:7832
         }
         respond 403
     }
@@ -526,12 +526,12 @@ bot.yourdomain.com {
         # basicauth {
         #     admin $2a$14$YourHashedPassword
         # }
-        reverse_proxy localhost:8080
+        reverse_proxy localhost:7832
     }
 
     # 其他所有请求
     handle {
-        reverse_proxy localhost:8080
+        reverse_proxy localhost:7832
     }
 }
 ```
@@ -541,7 +541,7 @@ bot.yourdomain.com {
 确保以下端口开放：
 - **443/tcp**: HTTPS（必需）
 - **80/tcp**: HTTP（用于重定向到 HTTPS）
-- **8080/tcp**: 仅本地访问（不要对外开放）
+- **7832/tcp**: 仅本地访问（不要对外开放）
 
 使用 UFW：
 ```bash
@@ -551,8 +551,8 @@ sudo ufw allow 443/tcp
 # 允许 HTTP（用于重定向）
 sudo ufw allow 80/tcp
 
-# 确保 8080 端口不对外开放
-sudo ufw deny 8080/tcp
+# 确保 7832 端口不对外开放
+sudo ufw deny 7832/tcp
 
 # 启用防火墙
 sudo ufw enable
@@ -708,7 +708,7 @@ find $BACKUP_DIR -name "backup_*.sql.gz" -mtime +$KEEP_DAYS -delete
 scrape_configs:
   - job_name: 'shopbot'
     static_configs:
-      - targets: ['localhost:8080']
+      - targets: ['localhost:7832']
     metrics_path: '/metrics'
 ```
 

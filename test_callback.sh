@@ -11,7 +11,7 @@ fi
 
 OUT_TRADE_NO=$1
 AMOUNT=$2
-CALLBACK_URL="http://localhost:8080/payment/epay/notify"
+CALLBACK_URL="http://localhost:7832/payment/epay/notify"
 
 # Generate test parameters
 PID="test_pid"
