@@ -132,7 +132,7 @@ func GetOrCreateUser(db *gorm.DB, tgUserID int64, username string) (*User, error
 	user = User{
 		TgUserID: tgUserID,
 		Username: username,
-		Language: "en",
+		Language: "", // Empty by default, will be detected on first interaction
 	}
 	
 	if err := db.Create(&user).Error; err != nil {

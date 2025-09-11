@@ -149,8 +149,8 @@ func (b *Bot) handleStart(message *tgbotapi.Message) {
 	// Determine user language
 	lang := messages.GetUserLanguage(user.Language, langCode)
 	
-	// Update user language if needed
-	if user.Language == "" && langCode != "" {
+	// Auto-detect language for new users or users with default English
+	if user.Language == "" || (user.Language == "en" && strings.HasPrefix(langCode, "zh")) {
 		detectedLang := "en"
 		if strings.HasPrefix(langCode, "zh") {
 			detectedLang = "zh"
@@ -188,6 +188,13 @@ func (b *Bot) handleStart(message *tgbotapi.Message) {
 func (b *Bot) handleTextMessage(message *tgbotapi.Message) {
 	// Get user for language
 	user, _ := store.GetOrCreateUser(b.db, message.From.ID, message.From.UserName)
+	
+	// Auto-detect language if user has default English but Telegram shows Chinese
+	if user.Language == "en" && strings.HasPrefix(message.From.LanguageCode, "zh") {
+		b.db.Model(&user).Update("language", "zh")
+		user.Language = "zh"
+	}
+	
 	lang := messages.GetUserLanguage(user.Language, message.From.LanguageCode)
 	
 	// Log the received message text for debugging

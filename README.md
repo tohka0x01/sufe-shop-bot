@@ -1,915 +1,490 @@
-# Telegram Shop Bot - 电商机器人系统
+# Claude Code PM
 
-一个功能完整的 Telegram 电商机器人系统，支持商品展示、库存管理、在线支付、多语言、群组推送等功能。
+[![Automaze](https://img.shields.io/badge/By-automaze.io-4b3baf)](https://automaze.io)
+&nbsp;
+[![Claude Code](https://img.shields.io/badge/+-Claude%20Code-d97757)](https://github.com/automazeio/ccpm/blob/main/README.md)
+[![GitHub Issues](https://img.shields.io/badge/+-GitHub%20Issues-1f2328)](https://github.com/automazeio/ccpm)
+&nbsp;
+[![MIT License](https://img.shields.io/badge/License-MIT-28a745)](https://github.com/automazeio/ccpm/blob/main/LICENSE)
+&nbsp;
+[![Follow on 𝕏](https://img.shields.io/badge/𝕏-@aroussi-1c9bf0)](http://x.com/intent/follow?screen_name=aroussi)
+&nbsp;
+[![Star this repo](https://img.shields.io/badge/★-Star%20this%20repo-e7b10b)](https://github.com/automazeio/ccpm)
 
-## 功能特性
+### Claude Code workflow to ship ~~faster~~ _better_ using spec-driven development, GitHub issues, Git worktrees, and mutiple AI agents running in parallel.
 
-### 核心功能
-- 🛍️ **商品管理**: 支持多类别商品展示，实时库存管理
-- 💳 **支付集成**: 集成彩虹易支付，支持多种支付方式
-- 🔐 **卡密系统**: 自动发货，支持批量导入卡密
-- 💰 **余额系统**: 用户余额充值、消费，充值卡兑换
-- 🌐 **多语言支持**: 中文/英文界面，自动语言检测
-- 📊 **管理后台**: Web 管理界面，商品/订单/用户管理
-- 📢 **消息推送**: 支持用户/群组消息广播，库存更新通知
-- 🔄 **失败重试**: 发货失败自动重试机制
-- 📈 **监控指标**: Prometheus 指标采集
-- 🚀 **高性能**: Redis 缓存，支持 Webhook 模式
+Stop losing context. Stop blocking on tasks. Stop shipping bugs. This battle-tested system turns PRDs into epics, epics into GitHub issues, and issues into production code – with full traceability at every step.
 
-### 用户功能
-- 商品浏览与搜索
-- 在线下单支付
-- 订单查询
-- 购买历史
-- 余额查询与充值
-- 多语言切换
-- 客服联系
+![Claude Code PM](screenshot.webp)
 
-### 管理功能
-- 商品上下架管理
-- 库存批量导入
-- 订单状态管理
-- 用户管理
-- 消息模板编辑
-- 广播消息发送
-- 数据统计分析
+## Table of Contents
 
-## 技术架构
+- [Background](#background)
+- [The Workflow](#the-workflow)
+- [What Makes This Different?](#what-makes-this-different)
+- [Why GitHub Issues?](#why-github-issues)
+- [Core Principle: No Vibe Coding](#core-principle-no-vibe-coding)
+- [System Architecture](#system-architecture)
+- [Workflow Phases](#workflow-phases)
+- [Command Reference](#command-reference)
+- [The Parallel Execution System](#the-parallel-execution-system)
+- [Key Features & Benefits](#key-features--benefits)
+- [Proven Results](#proven-results)
+- [Example Flow](#example-flow)
+- [Get Started Now](#get-started-now)
+- [Local vs Remote](#local-vs-remote)
+- [Technical Notes](#technical-notes)
+- [Support This Project](#support-this-project)
 
-- **语言**: Go 1.22+
-- **Web框架**: Gin
-- **ORM**: GORM
-- **数据库**: PostgreSQL/MySQL
-- **缓存**: Redis
-- **消息队列**: 内置 Channel 实现
-- **Bot框架**: telegram-bot-api
-- **监控**: Prometheus
-- **容器化**: Docker
+## Background
 
-## 快速开始
+Every team struggles with the same problems:
+- **Context evaporates** between sessions, forcing constant re-discovery
+- **Parallel work creates conflicts** when multiple developers touch the same code
+- **Requirements drift** as verbal decisions override written specs
+- **Progress becomes invisible** until the very end
 
-### 环境要求
+This system solves all of that.
 
-- Go 1.22 或更高版本
-- PostgreSQL 12+ 或 MySQL 8+
-- Redis 6+ (可选)
-- Docker & Docker Compose (用于容器化部署)
+## The Workflow
 
-### 获取代码
+```mermaid
+graph LR
+    A[PRD Creation] --> B[Epic Planning]
+    B --> C[Task Decomposition]
+    C --> D[GitHub Sync]
+    D --> E[Parallel Execution]
+```
+
+### See It In Action (60 seconds)
 
 ```bash
-git clone https://github.com/yourusername/telegram-shop-bot.git
-cd telegram-shop-bot
+# Create a comprehensive PRD through guided brainstorming
+/pm:prd-new memory-system
+
+# Transform PRD into a technical epic with task breakdown
+/pm:prd-parse memory-system
+
+# Push to GitHub and start parallel execution
+/pm:epic-oneshot memory-system
+/pm:issue-start 1235
 ```
 
-### 配置文件
+## What Makes This Different?
 
-创建 `config.yaml` 配置文件：
+| Traditional Development | Claude Code PM System |
+|------------------------|----------------------|
+| Context lost between sessions | **Persistent context** across all work |
+| Serial task execution | **Parallel agents** on independent tasks |
+| "Vibe coding" from memory | **Spec-driven** with full traceability |
+| Progress hidden in branches | **Transparent audit trail** in GitHub |
+| Manual task coordination | **Intelligent prioritization** with `/pm:next` |
 
-```yaml
-# Telegram Bot 配置
-telegram:
-  token: "YOUR_BOT_TOKEN"
-  webhook_url: "https://yourdomain.com/webhook"  # Webhook模式使用
-  mode: "polling"  # polling 或 webhook
+## Why GitHub Issues?
 
-# 数据库配置
-database:
-  driver: "postgres"  # postgres 或 mysql
-  dsn: "host=localhost user=shopbot password=password dbname=shopbot port=5432 sslmode=disable"
-  # MySQL DSN 示例: "shopbot:password@tcp(localhost:3306)/shopbot?charset=utf8mb4&parseTime=True&loc=Local"
+Most Claude Code workflows operate in isolation – a single developer working with AI in their local environment. This creates a fundamental problem: **AI-assisted development becomes a silo**.
 
-# Redis 缓存配置（可选）
-redis:
-  url: "redis://localhost:6379/0"
-  # 密码保护: "redis://:password@localhost:6379/0"
+By using GitHub Issues as our database, we unlock something powerful:
 
-# HTTP 服务器配置
-server:
-  port: 7832
-  admin_username: "admin"
-  admin_password: "secure_password"
+### 🤝 **True Team Collaboration**
+- Multiple Claude instances can work on the same project simultaneously
+- Human developers see AI progress in real-time through issue comments
+- Team members can jump in anywhere – the context is always visible
+- Managers get transparency without interrupting flow
 
-# 彩虹易支付配置
-epay:
-  api_url: "https://pay.example.com"
-  pid: "10001"
-  key: "your_secret_key"
+### 🔄 **Seamless Human-AI Handoffs**
+- AI can start a task, human can finish it (or vice versa)
+- Progress updates are visible to everyone, not trapped in chat logs
+- Code reviews happen naturally through PR comments
+- No "what did the AI do?" meetings
 
-# 日志配置
-log:
-  level: "info"  # debug, info, warn, error
-  format: "json" # json 或 text
+### 📈 **Scalable Beyond Solo Work**
+- Add team members without onboarding friction
+- Multiple AI agents working in parallel on different issues
+- Distributed teams stay synchronized automatically
+- Works with existing GitHub workflows and tools
 
-# 语言配置
-language:
-  default: "zh"
-  supported: ["zh", "en"]
+### 🎯 **Single Source of Truth**
+- No separate databases or project management tools
+- Issue state is the project state
+- Comments are the audit trail
+- Labels provide organization
 
-# 消息推送配置
-broadcast:
-  workers: 10
-  rate_limit: 30  # 每秒消息数
+This isn't just a project management system – it's a **collaboration protocol** that lets humans and AI agents work together at scale, using infrastructure your team already trusts.
 
-# 失败重试配置
-retry:
-  max_attempts: 3
-  initial_delay: "1m"
-  max_delay: "1h"
+## Core Principle: No Vibe Coding
+
+> **Every line of code must trace back to a specification.**
+
+We follow a strict 5-phase discipline:
+
+1. **🧠 Brainstorm** - Think deeper than comfortable
+2. **📝 Document** - Write specs that leave nothing to interpretation
+3. **📐 Plan** - Architect with explicit technical decisions
+4. **⚡ Execute** - Build exactly what was specified
+5. **📊 Track** - Maintain transparent progress at every step
+
+No shortcuts. No assumptions. No regrets.
+
+## System Architecture
+
+```
+.claude/
+├── CLAUDE.md          # Always-on instructions (copy content to your project's CLAUDE.md file)
+├── agents/            # Task-oriented agents (for context preservation)
+├── commands/          # Command definitions
+│   ├── context/       # Create, update, and prime context
+│   ├── pm/            # ← Project management commands (this system)
+│   └── testing/       # Prime and execute tests (edit this)
+├── context/           # Project-wide context files
+├── epics/             # ← PM's local workspace (place in .gitignore)
+│   └── [epic-name]/   # Epic and related tasks
+│       ├── epic.md    # Implementation plan
+│       ├── [#].md     # Individual task files
+│       └── updates/   # Work-in-progress updates
+├── prds/              # ← PM's PRD files
+├── rules/             # Place any rule files you'd like to reference here
+└── scripts/           # Place any script files you'd like to use here
 ```
 
-### 本地开发部署
+## Workflow Phases
 
-1. **安装依赖**
+### 1. Product Planning Phase
 
 ```bash
-go mod download
+/pm:prd-new feature-name
 ```
+Launches comprehensive brainstorming to create a Product Requirements Document capturing vision, user stories, success criteria, and constraints.
 
-2. **初始化数据库**
+**Output:** `.claude/prds/feature-name.md`
 
-PostgreSQL:
-```sql
-CREATE DATABASE shopbot;
-```
-
-MySQL:
-```sql
-CREATE DATABASE shopbot CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-3. **运行程序**
+### 2. Implementation Planning Phase
 
 ```bash
-go run cmd/server/main.go
+/pm:prd-parse feature-name
 ```
+Transforms PRD into a technical implementation plan with architectural decisions, technical approach, and dependency mapping.
 
-程序会自动创建数据库表结构。
+**Output:** `.claude/epics/feature-name/epic.md`
 
-4. **访问管理后台**
-
-打开浏览器访问 `http://localhost:7832/admin`，使用配置文件中的管理员账号登录。
-
-### Docker 部署
-
-#### 使用 Docker Compose（推荐）
-
-1. **创建 docker-compose.yml**
-
-```yaml
-version: '3.8'
-
-services:
-  postgres:
-    image: postgres:15-alpine
-    container_name: shopbot-db
-    environment:
-      POSTGRES_DB: shopbot
-      POSTGRES_USER: shopbot
-      POSTGRES_PASSWORD: shopbot_password
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - shopbot-net
-    restart: unless-stopped
-
-  redis:
-    image: redis:7-alpine
-    container_name: shopbot-redis
-    command: redis-server --requirepass redis_password
-    volumes:
-      - redis_data:/data
-    networks:
-      - shopbot-net
-    restart: unless-stopped
-
-  app:
-    build: .
-    container_name: shopbot-app
-    depends_on:
-      - postgres
-      - redis
-    environment:
-      - CONFIG_PATH=/app/config.yaml
-    volumes:
-      - ./config.yaml:/app/config.yaml
-      - ./templates:/app/templates
-      - ./static:/app/static
-    ports:
-      - "7832:7832"
-    networks:
-      - shopbot-net
-    restart: unless-stopped
-
-volumes:
-  postgres_data:
-  redis_data:
-
-networks:
-  shopbot-net:
-    driver: bridge
-```
-
-2. **创建生产环境配置文件 config.yaml**
-
-```yaml
-telegram:
-  token: "YOUR_BOT_TOKEN"
-  webhook_url: "https://yourdomain.com/webhook"
-  mode: "webhook"  # 生产环境推荐使用 webhook
-
-database:
-  driver: "postgres"
-  dsn: "host=postgres user=shopbot password=shopbot_password dbname=shopbot port=5432 sslmode=disable"
-
-redis:
-  url: "redis://:redis_password@redis:6379/0"
-
-server:
-  port: 7832
-  admin_username: "admin"
-  admin_password: "your_secure_admin_password"
-
-epay:
-  api_url: "https://pay.example.com"
-  pid: "10001"
-  key: "your_secret_key"
-
-log:
-  level: "info"
-  format: "json"
-
-language:
-  default: "zh"
-  supported: ["zh", "en"]
-
-broadcast:
-  workers: 20
-  rate_limit: 50
-
-retry:
-  max_attempts: 5
-  initial_delay: "30s"
-  max_delay: "1h"
-```
-
-3. **启动服务**
+### 3. Task Decomposition Phase
 
 ```bash
-# 构建并启动所有服务
-docker-compose up -d
-
-# 查看日志
-docker-compose logs -f app
-
-# 停止服务
-docker-compose down
-
-# 停止并删除数据
-docker-compose down -v
+/pm:epic-decompose feature-name
 ```
+Breaks epic into concrete, actionable tasks with acceptance criteria, effort estimates, and parallelization flags.
 
-#### 单独使用 Docker
+**Output:** `.claude/epics/feature-name/[task].md`
 
-1. **构建镜像**
+### 4. GitHub Synchronization
 
 ```bash
-docker build -t telegram-shop-bot:latest .
+/pm:epic-sync feature-name
+# Or for confident workflows:
+/pm:epic-oneshot feature-name
 ```
+Pushes epic and tasks to GitHub as issues with appropriate labels and relationships.
 
-2. **运行容器**
+### 5. Execution Phase
 
 ```bash
-# 创建网络
-docker network create shopbot-net
-
-# 运行 PostgreSQL
-docker run -d \
-  --name shopbot-db \
-  --network shopbot-net \
-  -e POSTGRES_DB=shopbot \
-  -e POSTGRES_USER=shopbot \
-  -e POSTGRES_PASSWORD=shopbot_password \
-  -v shopbot-postgres:/var/lib/postgresql/data \
-  postgres:15-alpine
-
-# 运行 Redis
-docker run -d \
-  --name shopbot-redis \
-  --network shopbot-net \
-  -v shopbot-redis:/data \
-  redis:7-alpine redis-server --requirepass redis_password
-
-# 运行应用
-docker run -d \
-  --name shopbot-app \
-  --network shopbot-net \
-  -p 7832:7832 \
-  -v $(pwd)/config.yaml:/app/config.yaml \
-  -v $(pwd)/templates:/app/templates \
-  -v $(pwd)/static:/app/static \
-  telegram-shop-bot:latest
+/pm:issue-start 1234  # Launch specialized agent
+/pm:issue-sync 1234   # Push progress updates
+/pm:next             # Get next priority task
 ```
+Specialized agents implement tasks while maintaining progress updates and an audit trail.
 
-### 生产环境部署
+## Command Reference
 
-#### 1. 反向代理配置
+> [!TIP]
+> Type `/pm:help` for a concise command summary
 
-##### 端口说明
+### Initial Setup
+- `/pm:init` - Install dependencies and configure GitHub
 
-本项目使用以下端口：
-- **7832**: HTTP 服务器主端口（管理后台、API、Webhook）
-- **9147**: Webhook 专用端口（仅在 webhook 模式下使用）
+### PRD Commands
+- `/pm:prd-new` - Launch brainstorming for new product requirement
+- `/pm:prd-parse` - Convert PRD to implementation epic
+- `/pm:prd-list` - List all PRDs
+- `/pm:prd-edit` - Edit existing PRD
+- `/pm:prd-status` - Show PRD implementation status
 
-##### Nginx 反向代理配置
+### Epic Commands
+- `/pm:epic-decompose` - Break epic into task files
+- `/pm:epic-sync` - Push epic and tasks to GitHub
+- `/pm:epic-oneshot` - Decompose and sync in one command
+- `/pm:epic-list` - List all epics
+- `/pm:epic-show` - Display epic and its tasks
+- `/pm:epic-close` - Mark epic as complete
+- `/pm:epic-edit` - Edit epic details
+- `/pm:epic-refresh` - Update epic progress from tasks
 
-**轮询模式（Polling Mode）配置：**
+### Issue Commands
+- `/pm:issue-show` - Display issue and sub-issues
+- `/pm:issue-status` - Check issue status
+- `/pm:issue-start` - Begin work with specialized agent
+- `/pm:issue-sync` - Push updates to GitHub
+- `/pm:issue-close` - Mark issue as complete
+- `/pm:issue-reopen` - Reopen closed issue
+- `/pm:issue-edit` - Edit issue details
 
-```nginx
-server {
-    listen 80;
-    server_name bot.yourdomain.com;
-    return 301 https://$server_name$request_uri;
-}
+### Workflow Commands
+- `/pm:next` - Show next priority issue with epic context
+- `/pm:status` - Overall project dashboard
+- `/pm:standup` - Daily standup report
+- `/pm:blocked` - Show blocked tasks
+- `/pm:in-progress` - List work in progress
 
-server {
-    listen 443 ssl http2;
-    server_name bot.yourdomain.com;
+### Sync Commands
+- `/pm:sync` - Full bidirectional sync with GitHub
+- `/pm:import` - Import existing GitHub issues
 
-    ssl_certificate /etc/letsencrypt/live/bot.yourdomain.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/bot.yourdomain.com/privkey.pem;
+### Maintenance Commands
+- `/pm:validate` - Check system integrity
+- `/pm:clean` - Archive completed work
+- `/pm:search` - Search across all content
 
-    # 管理后台
-    location /admin {
-        proxy_pass http://localhost:7832;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
+## The Parallel Execution System
 
-    # API 接口
-    location /api {
-        proxy_pass http://localhost:7832;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
+### Issues Aren't Atomic
 
-    # 支付回调
-    location /callback {
-        proxy_pass http://localhost:7832;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
+Traditional thinking: One issue = One developer = One task
 
-    # 静态资源
-    location /static {
-        proxy_pass http://localhost:7832;
-        proxy_set_header Host $host;
-        proxy_cache_valid 200 1h;
-        proxy_cache_key $uri$is_args$args;
-    }
+**Reality: One issue = Multiple parallel work streams**
 
-    # 指标监控
-    location /metrics {
-        proxy_pass http://localhost:7832;
-        # 建议添加 IP 白名单
-        allow 10.0.0.0/8;
-        allow 172.16.0.0/12;
-        allow 192.168.0.0/16;
-        deny all;
-    }
-}
-```
+A single "Implement user authentication" issue isn't one task. It's...
 
-**Webhook 模式配置（推荐）：**
+- **Agent 1**: Database tables and migrations
+- **Agent 2**: Service layer and business logic
+- **Agent 3**: API endpoints and middleware
+- **Agent 4**: UI components and forms
+- **Agent 5**: Test suites and documentation
 
-```nginx
-server {
-    listen 80;
-    server_name bot.yourdomain.com;
-    return 301 https://$server_name$request_uri;
-}
+All running **simultaneously** in the same worktree.
 
-server {
-    listen 443 ssl http2;
-    server_name bot.yourdomain.com;
+### The Math of Velocity
 
-    ssl_certificate /etc/letsencrypt/live/bot.yourdomain.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/bot.yourdomain.com/privkey.pem;
+**Traditional Approach:**
+- Epic with 3 issues
+- Sequential execution
 
-    # Telegram Webhook 接收端点（重要）
-    location /webhook {
-        proxy_pass http://localhost:7832/webhook;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        
-        # Telegram 服务器 IP 白名单（可选但推荐）
-        # 参考: https://core.telegram.org/bots/webhooks#the-good-the-bad-and-the-ugly
-        allow 149.154.160.0/20;
-        allow 91.108.4.0/22;
-        allow 91.108.8.0/21;
-        allow 91.108.16.0/21;
-        allow 91.108.56.0/22;
-        allow 2001:b28:f23c::/47;
-        allow 2001:b28:f23f::/48;
-        allow 2001:67c:4e8::/48;
-        allow 2001:b28:f23d::/48;
-        allow 2001:b28:f242::/48;
-        deny all;
-    }
+**This System:**
+- Same epic with 3 issues
+- Each issue splits into ~4 parallel streams
+- **12 agents working simultaneously**
 
-    # 管理后台
-    location /admin {
-        proxy_pass http://localhost:7832;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        
-        # 可选：添加 Basic Auth 额外保护
-        # auth_basic "Admin Area";
-        # auth_basic_user_file /etc/nginx/.htpasswd;
-    }
+We're not assigning agents to issues. We're **leveraging multiple agents** to ship faster.
 
-    # API 接口
-    location /api {
-        proxy_pass http://localhost:7832;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
+### Context Optimization
 
-    # 支付回调（重要）
-    location /callback {
-        proxy_pass http://localhost:7832;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
+**Traditional single-thread approach:**
+- Main conversation carries ALL the implementation details
+- Context window fills with database schemas, API code, UI components
+- Eventually hits context limits and loses coherence
 
-    # 其他所有请求
-    location / {
-        proxy_pass http://localhost:7832;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
+**Parallel agent approach:**
+- Main thread stays clean and strategic
+- Each agent handles its own context in isolation
+- Implementation details never pollute the main conversation
+- Main thread maintains oversight without drowning in code
 
-##### Apache 反向代理配置
+Your main conversation becomes the conductor, not the orchestra.
 
-如果使用 Apache 作为反向代理：
+### GitHub vs Local: Perfect Separation
 
-```apache
-<VirtualHost *:80>
-    ServerName bot.yourdomain.com
-    Redirect permanent / https://bot.yourdomain.com/
-</VirtualHost>
+**What GitHub Sees:**
+- Clean, simple issues
+- Progress updates
+- Completion status
 
-<VirtualHost *:443>
-    ServerName bot.yourdomain.com
+**What Actually Happens Locally:**
+- Issue #1234 explodes into 5 parallel agents
+- Agents coordinate through Git commits
+- Complex orchestration hidden from view
 
-    SSLEngine on
-    SSLCertificateFile /etc/letsencrypt/live/bot.yourdomain.com/fullchain.pem
-    SSLCertificateKeyFile /etc/letsencrypt/live/bot.yourdomain.com/privkey.pem
+GitHub doesn't need to know HOW the work got done – just that it IS done.
 
-    ProxyPreserveHost On
-    ProxyRequests Off
-
-    # Webhook 端点
-    ProxyPass /webhook http://localhost:7832/webhook
-    ProxyPassReverse /webhook http://localhost:7832/webhook
-
-    # 管理后台
-    ProxyPass /admin http://localhost:7832/admin
-    ProxyPassReverse /admin http://localhost:7832/admin
-
-    # API 和其他
-    ProxyPass / http://localhost:7832/
-    ProxyPassReverse / http://localhost:7832/
-</VirtualHost>
-```
-
-##### Caddy 反向代理配置
-
-使用 Caddy（自动 HTTPS）：
-
-```caddyfile
-bot.yourdomain.com {
-    # Webhook 端点
-    handle /webhook* {
-        reverse_proxy localhost:7832
-        
-        # Telegram IP 白名单
-        @telegram_ips {
-            remote_ip 149.154.160.0/20 91.108.4.0/22 91.108.8.0/21 91.108.16.0/21 91.108.56.0/22
-        }
-        handle @telegram_ips {
-            reverse_proxy localhost:7832
-        }
-        respond 403
-    }
-
-    # 管理后台（可选认证）
-    handle /admin* {
-        # basicauth {
-        #     admin $2a$14$YourHashedPassword
-        # }
-        reverse_proxy localhost:7832
-    }
-
-    # 其他所有请求
-    handle {
-        reverse_proxy localhost:7832
-    }
-}
-```
-
-#### 2. 防火墙配置
-
-确保以下端口开放：
-- **443/tcp**: HTTPS（必需）
-- **80/tcp**: HTTP（用于重定向到 HTTPS）
-- **7832/tcp**: 仅本地访问（不要对外开放）
-
-使用 UFW：
-```bash
-# 允许 HTTPS
-sudo ufw allow 443/tcp
-
-# 允许 HTTP（用于重定向）
-sudo ufw allow 80/tcp
-
-# 确保 7832 端口不对外开放
-sudo ufw deny 7832/tcp
-
-# 启用防火墙
-sudo ufw enable
-```
-
-使用 firewalld：
-```bash
-# 允许 HTTPS
-sudo firewall-cmd --permanent --add-service=https
-
-# 允许 HTTP
-sudo firewall-cmd --permanent --add-service=http
-
-# 重载配置
-sudo firewall-cmd --reload
-```
-
-#### 3. 域名与 SSL 配置
-
-使用 Let's Encrypt 获取免费 SSL 证书：
+### The Command Flow
 
 ```bash
-# 安装 Certbot
-sudo apt-get update
-sudo apt-get install certbot python3-certbot-nginx
+# Analyze what can be parallelized
+/pm:issue-analyze 1234
 
-# 获取证书（Nginx）
-sudo certbot --nginx -d bot.yourdomain.com
+# Launch the swarm
+/pm:epic-start memory-system
 
-# 或手动获取证书
-sudo certbot certonly --standalone -d bot.yourdomain.com
+# Watch the magic
+# 12 agents working across 3 issues
+# All in: ../epic-memory-system/
 
-# 设置自动续期
-sudo certbot renew --dry-run
+# One clean merge when done
+/pm:epic-merge memory-system
 ```
 
-#### 4. Systemd 服务配置
+## Key Features & Benefits
 
-创建 `/etc/systemd/system/shopbot.service`：
+### 🧠 **Context Preservation**
+Never lose project state again. Each epic maintains its own context, agents read from `.claude/context/`, and updates locally before syncing.
 
-```ini
-[Unit]
-Description=Telegram Shop Bot
-After=network.target postgresql.service redis.service
+### ⚡ **Parallel Execution**
+Ship faster with multiple agents working simultaneously. Tasks marked `parallel: true` enable conflict-free concurrent development.
 
-[Service]
-Type=simple
-User=shopbot
-Group=shopbot
-WorkingDirectory=/opt/shopbot
-ExecStart=/opt/shopbot/shopbot
-Restart=always
-RestartSec=5
-Environment="CONFIG_PATH=/opt/shopbot/config.yaml"
+### 🔗 **GitHub Native**
+Works with tools your team already uses. Issues are the source of truth, comments provide history, and there is no dependency on the Projects API.
 
-# 安全限制
-NoNewPrivileges=true
-PrivateTmp=true
-ProtectSystem=strict
-ProtectHome=true
-ReadWritePaths=/opt/shopbot/logs
+### 🤖 **Agent Specialization**
+Right tool for every job. Different agents for UI, API, and database work. Each reads requirements and posts updates automatically.
 
-[Install]
-WantedBy=multi-user.target
-```
+### 📊 **Full Traceability**
+Every decision is documented. PRD → Epic → Task → Issue → Code → Commit. Complete audit trail from idea to production.
 
-启动服务：
+### 🚀 **Developer Productivity**
+Focus on building, not managing. Intelligent prioritization, automatic context loading, and incremental sync when ready.
+
+## Proven Results
+
+Teams using this system report:
+- **89% less time** lost to context switching – you'll use `/compact` and `/clear` a LOT less
+- **5-8 parallel tasks** vs 1 previously – editing/testing multiple files at the same time
+- **75% reduction** in bug rates – due to the breaking down features into detailed tasks
+- **Up to 3x faster** feature delivery – based on feature size and complexity
+
+## Example Flow
 
 ```bash
-systemctl daemon-reload
-systemctl enable shopbot
-systemctl start shopbot
-systemctl status shopbot
+# Start a new feature
+/pm:prd-new memory-system
+
+# Review and refine the PRD...
+
+# Create implementation plan
+/pm:prd-parse memory-system
+
+# Review the epic...
+
+# Break into tasks and push to GitHub
+/pm:epic-oneshot memory-system
+# Creates issues: #1234 (epic), #1235, #1236 (tasks)
+
+# Start development on a task
+/pm:issue-start 1235
+# Agent begins work, maintains local progress
+
+# Sync progress to GitHub
+/pm:issue-sync 1235
+# Updates posted as issue comments
+
+# Check overall status
+/pm:epic-show memory-system
 ```
 
-#### 5. 设置 Telegram Webhook
+## Get Started Now
 
-**重要提示：** Webhook 模式需要满足以下条件：
-1. 必须使用 HTTPS（443 端口）
-2. 需要有效的 SSL 证书（自签名证书不被接受）
-3. 域名必须公网可访问
+### Quick Setup (2 minutes)
 
-设置 Webhook：
+1. **Install this repository into your project**:
+
+   #### Unix/Linux/macOS
+
+   ```bash
+   cd path/to/your/project/
+   curl -sSL https://raw.githubusercontent.com/automazeio/ccpm/main/ccpm.sh | bash
+   # or: wget -qO- https://raw.githubusercontent.com/automazeio/ccpm/main/ccpm.sh | bash
+   ```
+
+   #### Windows (PowerShell)
+   ```bash
+   cd path/to/your/project/
+   iwr -useb https://raw.githubusercontent.com/automazeio/ccpm/main/ccpm.bat | iex
+   ```
+   > ⚠️ **IMPORTANT**: If you already have a `.claude` directory, clone this repository to a different directory and copy the contents of the cloned `.claude` directory to your project's `.claude` directory.
+
+   See full/other installation options in the [installation guide ›](https://github.com/automazeio/ccpm/tree/main/install)
+
+
+2. **Initialize the PM system**:
+   ```bash
+   /pm:init
+   ```
+   This command will:
+   - Install GitHub CLI (if needed)
+   - Authenticate with GitHub
+   - Install [gh-sub-issue extension](https://github.com/yahsan2/gh-sub-issue) for proper parent-child relationships
+   - Create required directories
+   - Update .gitignore
+
+3. **Create `CLAUDE.md`** with your repository information
+   ```bash
+   /init include rules from .claude/CLAUDE.md
+   ```
+   > If you already have a `CLAUDE.md` file, run: `/re-init` to update it with important rules from `.claude/CLAUDE.md`.
+
+4. **Prime the system**:
+   ```bash
+   /context:create
+   ```
+
+
+
+### Start Your First Feature
 
 ```bash
-curl -F "url=https://bot.yourdomain.com/webhook" \
-     https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook
+/pm:prd-new your-feature-name
 ```
 
-验证 Webhook：
+Watch as structured planning transforms into shipped code.
 
-```bash
-curl https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getWebhookInfo
-```
+## Local vs Remote
 
-### 数据库备份
+| Operation | Local | GitHub |
+|-----------|-------|--------|
+| PRD Creation | ✅ | — |
+| Implementation Planning | ✅ | — |
+| Task Breakdown | ✅ | ✅ (sync) |
+| Execution | ✅ | — |
+| Status Updates | ✅ | ✅ (sync) |
+| Final Deliverables | — | ✅ |
 
-#### PostgreSQL 备份
+## Technical Notes
 
-```bash
-# 备份
-pg_dump -h localhost -U shopbot -d shopbot > backup_$(date +%Y%m%d_%H%M%S).sql
+### GitHub Integration
+- Uses **gh-sub-issue extension** for proper parent-child relationships
+- Falls back to task lists if extension not installed
+- Epic issues track sub-task completion automatically
+- Labels provide additional organization (`epic:feature`, `task:feature`)
 
-# 恢复
-psql -h localhost -U shopbot -d shopbot < backup_20240101_120000.sql
-```
+### File Naming Convention
+- Tasks start as `001.md`, `002.md` during decomposition
+- After GitHub sync, renamed to `{issue-id}.md` (e.g., `1234.md`)
+- Makes it easy to navigate: issue #1234 = file `1234.md`
 
-#### MySQL 备份
+### Design Decisions
+- Intentionally avoids GitHub Projects API complexity
+- All commands operate on local files first for speed
+- Synchronization with GitHub is explicit and controlled
+- Worktrees provide clean git isolation for parallel work
+- GitHub Projects can be added separately for visualization
 
-```bash
-# 备份
-mysqldump -h localhost -u shopbot -p shopbot > backup_$(date +%Y%m%d_%H%M%S).sql
+---
 
-# 恢复
-mysql -h localhost -u shopbot -p shopbot < backup_20240101_120000.sql
-```
+## Support This Project
 
-#### 自动备份脚本
+Claude Code PM was developed at [Automaze](https://automaze.io) **for developers who ship, by developers who ship**.
 
-创建 `/opt/shopbot/backup.sh`：
+If Claude Code PM helps your team ship better software:
 
-```bash
-#!/bin/bash
-BACKUP_DIR="/opt/shopbot/backups"
-DB_NAME="shopbot"
-DB_USER="shopbot"
-DB_PASS="shopbot_password"
-KEEP_DAYS=7
+- ⭐ **[Star this repository](https://github.com/automazeio/ccpm)** to show your support
+- 🐦 **[Follow @aroussi on X](https://x.com/aroussi)** for updates and tips
 
-# 创建备份目录
-mkdir -p $BACKUP_DIR
 
-# 备份数据库
-PGPASSWORD=$DB_PASS pg_dump -h localhost -U $DB_USER -d $DB_NAME | gzip > $BACKUP_DIR/backup_$(date +%Y%m%d_%H%M%S).sql.gz
+---
 
-# 删除旧备份
-find $BACKUP_DIR -name "backup_*.sql.gz" -mtime +$KEEP_DAYS -delete
-```
+> [!TIP]
+> **Ship faster with Automaze.** We partner with founders to bring their vision to life, scale their business, and optimize for success.
+> **[Visit Automaze to book a call with me ›](https://automaze.io)**
 
-添加到 crontab：
+---
 
-```bash
-0 2 * * * /opt/shopbot/backup.sh
-```
+## Star History
 
-## 监控与维护
-
-### Prometheus 监控
-
-在 `prometheus.yml` 中添加：
-
-```yaml
-scrape_configs:
-  - job_name: 'shopbot'
-    static_configs:
-      - targets: ['localhost:7832']
-    metrics_path: '/metrics'
-```
-
-可监控的指标：
-- `shopbot_orders_total` - 订单总数
-- `shopbot_orders_amount_total` - 订单总金额
-- `shopbot_active_users_total` - 活跃用户数
-- `shopbot_products_stock_total` - 商品库存总量
-- `shopbot_payment_callbacks_total` - 支付回调数
-- `shopbot_broadcast_messages_sent_total` - 广播消息发送数
-
-### 日志管理
-
-使用 logrotate 管理日志：
-
-创建 `/etc/logrotate.d/shopbot`：
-
-```
-/opt/shopbot/logs/*.log {
-    daily
-    rotate 14
-    compress
-    delaycompress
-    missingok
-    notifempty
-    create 0644 shopbot shopbot
-    sharedscripts
-    postrotate
-        systemctl reload shopbot
-    endscript
-}
-```
-
-### 性能优化
-
-1. **数据库优化**
-   - 为常用查询字段添加索引
-   - 定期执行 VACUUM（PostgreSQL）
-   - 优化查询语句
-
-2. **Redis 缓存策略**
-   - 商品信息缓存 10 分钟
-   - 用户信息缓存 5 分钟
-   - 热门商品永久缓存，手动失效
-
-3. **并发优化**
-   - 使用 Webhook 模式减少轮询开销
-   - 合理设置广播 worker 数量
-   - 使用数据库连接池
-
-## 常见问题
-
-### 1. Bot 无响应
-
-检查事项：
-- Bot Token 是否正确
-- 网络是否可以访问 Telegram API
-- 查看日志是否有错误信息
-
-### 2. 支付回调失败
-
-检查事项：
-- 回调 URL 是否可以从外网访问
-- 签名密钥是否正确
-- 查看支付平台的回调日志
-
-### 3. 数据库连接失败
-
-检查事项：
-- 数据库服务是否运行
-- 连接字符串是否正确
-- 防火墙是否允许连接
-
-### 4. 消息发送失败
-
-可能原因：
-- 用户屏蔽了 Bot
-- 发送频率过快被限制
-- 网络连接问题
-
-## 开发指南
-
-### 项目结构
-
-```
-├── cmd/
-│   └── server/          # 程序入口
-├── internal/
-│   ├── app/            # 应用程序容器
-│   ├── bot/            # Telegram Bot 逻辑
-│   ├── broadcast/      # 广播服务
-│   ├── cache/          # Redis 缓存
-│   ├── config/         # 配置管理
-│   ├── epay/           # 支付集成
-│   ├── httpadmin/      # Web 管理后台
-│   ├── i18n/           # 国际化
-│   ├── store/          # 数据存储层
-│   └── worker/         # 后台任务
-├── templates/          # HTML 模板
-├── static/            # 静态资源
-├── migrations/        # 数据库迁移
-├── docker/           # Docker 相关文件
-├── config.yaml       # 配置文件
-├── Dockerfile        # Docker 镜像定义
-├── docker-compose.yml # Docker Compose 配置
-└── README.md         # 本文档
-```
-
-### 添加新功能
-
-1. **添加新的数据模型**
-
-在 `internal/store/models.go` 中定义模型：
-
-```go
-type YourModel struct {
-    ID        uint      `gorm:"primaryKey"`
-    // 字段定义
-    CreatedAt time.Time
-    UpdatedAt time.Time
-}
-```
-
-2. **添加新的 Bot 命令**
-
-在 `internal/bot/handlers.go` 中添加处理器：
-
-```go
-func (b *Bot) handleYourCommand(ctx context.Context, msg *tgbotapi.Message) {
-    // 命令逻辑
-}
-```
-
-3. **添加新的管理页面**
-
-在 `internal/httpadmin/handlers.go` 中添加路由：
-
-```go
-func (s *Server) handleYourPage(c *gin.Context) {
-    // 页面逻辑
-}
-```
-
-### 测试
-
-运行测试：
-
-```bash
-go test ./...
-```
-
-运行特定测试：
-
-```bash
-go test -v ./internal/store -run TestYourFunction
-```
-
-## 安全建议
-
-1. **定期更新依赖**
-
-```bash
-go get -u ./...
-go mod tidy
-```
-
-2. **使用强密码**
-   - 管理后台密码
-   - 数据库密码
-   - Redis 密码
-
-3. **限制访问**
-   - 使用防火墙限制数据库访问
-   - 管理后台使用 IP 白名单
-   - 启用 Telegram Bot 的域名白名单
-
-4. **数据加密**
-   - 使用 HTTPS
-   - 敏感数据加密存储
-   - 定期备份并加密
-
-## 贡献指南
-
-1. Fork 项目
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建 Pull Request
-
-## 许可证
-
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
-
-## 联系方式
-
-- 项目主页: [https://github.com/yourusername/telegram-shop-bot](https://github.com/yourusername/telegram-shop-bot)
-- 问题反馈: [https://github.com/yourusername/telegram-shop-bot/issues](https://github.com/yourusername/telegram-shop-bot/issues)
-
-## 致谢
-
-- [Telegram Bot API](https://core.telegram.org/bots/api)
-- [Gin Web Framework](https://gin-gonic.com/)
-- [GORM](https://gorm.io/)
-- 所有贡献者
+![Star History Chart](https://api.star-history.com/svg?repos=automazeio/ccpm)
