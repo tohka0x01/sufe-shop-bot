@@ -795,3 +795,81 @@ label {
         border: 1px solid #ddd;
     }
 }
+
+/* ========================================
+   Theme Toggle Component
+   ======================================== */
+.theme-toggle {
+    position: relative;
+    width: 60px;
+    height: 30px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--spacing-sm);
+    margin-right: var(--spacing-md);
+    transition: all var(--transition-slow);
+}
+
+.theme-toggle:hover {
+    background: var(--hover-bg);
+}
+
+.theme-toggle-icon {
+    font-size: var(--font-size-sm);
+    transition: opacity var(--transition-slow);
+}
+
+.theme-toggle-icon.sun {
+    opacity: 0.3;
+}
+
+.theme-toggle-icon.moon {
+    opacity: 1;
+}
+
+[data-theme="light"] .theme-toggle-icon.sun {
+    opacity: 1;
+}
+
+[data-theme="light"] .theme-toggle-icon.moon {
+    opacity: 0.3;
+}
+
+/* ========================================
+   Alert Styles
+   ======================================== */
+.alert {
+    padding: var(--spacing-md);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-sm);
+}
+
+.alert-success {
+    background: rgba(56, 239, 125, 0.1);
+    border: 1px solid rgba(56, 239, 125, 0.3);
+    color: #38ef7d;
+}
+
+.alert-error {
+    background: rgba(245, 87, 108, 0.1);
+    border: 1px solid rgba(245, 87, 108, 0.3);
+    color: #f5576c;
+}
+
+.alert-warning {
+    background: rgba(254, 225, 64, 0.1);
+    border: 1px solid rgba(254, 225, 64, 0.3);
+    color: #fee140;
+}
+
+.alert-info {
+    background: rgba(79, 172, 254, 0.1);
+    border: 1px solid rgba(79, 172, 254, 0.3);
+    color: #4facfe;
+}
