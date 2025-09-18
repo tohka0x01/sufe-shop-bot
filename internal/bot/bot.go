@@ -43,22 +43,25 @@ type TicketService interface {
 	CreateTicket(userID int64, username, subject, category, content string) (*store.Ticket, error)
 }
 
-func New(token string, db *gorm.DB) (*Bot, error) {
+func New(token string, db *gorm.DB, cfg *config.Config) (*Bot, error) {
 	api, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create bot api: %w", err)
 	}
-	
-	// Load config for epay and base URL
-	cfg, err := config.Load()
-	if err != nil {
-		return nil, fmt.Errorf("failed to load config: %w", err)
-	}
-	
+
 	// Initialize epay client if configured
 	var epayClient *epay.Client
 	if cfg.EpayPID != "" && cfg.EpayKey != "" && cfg.EpayGateway != "" {
 		epayClient = epay.NewClient(cfg.EpayPID, cfg.EpayKey, cfg.EpayGateway)
+		logger.Info("Epay client initialized",
+			"pid", cfg.EpayPID,
+			"gateway", cfg.EpayGateway,
+			"base_url", cfg.BaseURL)
+	} else {
+		logger.Warn("Epay client not initialized - missing configuration",
+			"has_pid", cfg.EpayPID != "",
+			"has_key", cfg.EpayKey != "",
+			"has_gateway", cfg.EpayGateway != "")
 	}
 	
 	// Initialize notification service

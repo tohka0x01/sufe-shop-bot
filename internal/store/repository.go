@@ -2,7 +2,6 @@ package store
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -133,7 +132,7 @@ func GetOrCreateUser(db *gorm.DB, tgUserID int64, username string) (*User, error
 	user = User{
 		TgUserID: tgUserID,
 		Username: username,
-		Language: "en",
+		Language: "zh",
 	}
 	
 	if err := db.Create(&user).Error; err != nil {
@@ -160,7 +159,7 @@ func GetOrCreateUserWithStatus(db *gorm.DB, tgUserID int64, username string) (*U
 	user = User{
 		TgUserID: tgUserID,
 		Username: username,
-		Language: "en",
+		Language: "zh",
 	}
 	
 	if err := db.Create(&user).Error; err != nil {
@@ -376,7 +375,7 @@ func InitializeAdminsFromConfig(db *gorm.DB, cfg *config.Config) error {
 			adminUser = AdminUser{
 				Username:            username,
 				Password:            "", // Password will be set via web interface
-				TelegramID:          sql.NullInt64{Int64: telegramID, Valid: true},
+				TelegramID:          &telegramID,
 				ReceiveNotifications: true,
 				IsActive:            true,
 			}

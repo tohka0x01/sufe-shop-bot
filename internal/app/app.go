@@ -93,7 +93,7 @@ func New(cfg *config.Config, db *gorm.DB) (*Application, error) {
 	}
 
 	// Initialize Telegram bot
-	botInstance, err := bot.New(cfg.BotToken, db)
+	botInstance, err := bot.New(cfg.BotToken, db, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to init bot: %w", err)
 	}

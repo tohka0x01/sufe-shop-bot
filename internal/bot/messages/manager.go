@@ -107,14 +107,20 @@ func GetUserLanguage(userLang string, telegramLang string) string {
 	if userLang != "" {
 		return userLang
 	}
-	
+
 	// Map Telegram language codes to our supported languages
-	if strings.HasPrefix(telegramLang, "zh") {
+	// Chinese first (default)
+	if strings.HasPrefix(telegramLang, "zh") || telegramLang == "" {
 		return "zh"
 	}
-	
-	// Default to English
-	return "en"
+
+	// English for English-speaking users
+	if strings.HasPrefix(telegramLang, "en") {
+		return "en"
+	}
+
+	// Default to Chinese
+	return "zh"
 }
 
 // GetAvailableLanguages returns list of available languages
