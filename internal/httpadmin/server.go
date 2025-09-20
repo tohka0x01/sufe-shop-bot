@@ -199,9 +199,17 @@ func NewServerWithApp(adminToken string, app interface{}) *Server {
 		if cfg, ok := cfgField.Interface().(*config.Config); ok {
 			server.config = cfg
 
-			// Initialize payment client
-			if cfg.EpayPID != "" && cfg.EpayKey != "" {
+			// Initialize payment client with proper validation
+			if cfg.EpayPID != "" && cfg.EpayKey != "" && cfg.EpayGateway != "" {
 				server.epay = payment.NewClient(cfg.EpayPID, cfg.EpayKey, cfg.EpayGateway)
+				logger.Info("Payment client initialized on server startup",
+					"epay_pid", cfg.EpayPID,
+					"epay_gateway", cfg.EpayGateway)
+			} else {
+				logger.Info("Payment client not initialized due to incomplete configuration",
+					"epay_pid_empty", cfg.EpayPID == "",
+					"epay_key_empty", cfg.EpayKey == "",
+					"epay_gateway_empty", cfg.EpayGateway == "")
 			}
 		}
 	}

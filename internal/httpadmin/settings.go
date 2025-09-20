@@ -307,10 +307,27 @@ func (s *Server) handleSavePaymentSettings(c *gin.Context) {
 			return
 		}
 
-		// Update payment client if configuration changed
-		if s.config.EpayPID != "" && s.config.EpayKey != "" && s.config.EpayGateway != "" {
-			s.epay = payment.NewClient(s.config.EpayPID, s.config.EpayKey, s.config.EpayGateway)
-			logger.Info("Payment client updated with new configuration")
+		// Always try to update payment client when payment settings change
+		// This ensures configuration changes take effect immediately
+		if len(updates) > 0 {
+			// Log current configuration for debugging
+			logger.Info("Payment configuration after update",
+				"epay_pid", s.config.EpayPID,
+				"epay_key_set", s.config.EpayKey != "",
+				"epay_gateway", s.config.EpayGateway)
+
+			// Update payment client if we have the minimum required configuration
+			if s.config.EpayPID != "" && s.config.EpayKey != "" && s.config.EpayGateway != "" {
+				s.epay = payment.NewClient(s.config.EpayPID, s.config.EpayKey, s.config.EpayGateway)
+				logger.Info("Payment client updated with new configuration")
+			} else {
+				// Set to nil if configuration is incomplete to avoid using stale client
+				s.epay = nil
+				logger.Info("Payment client set to nil due to incomplete configuration",
+					"epay_pid_empty", s.config.EpayPID == "",
+					"epay_key_empty", s.config.EpayKey == "",
+					"epay_gateway_empty", s.config.EpayGateway == "")
+			}
 		}
 	} else {
 		// Fallback to direct database update
