@@ -223,6 +223,13 @@ func (b *Bot) handleStart(message *tgbotapi.Message) {
 	logger.Info("User started bot", "user_id", user.ID, "tg_user_id", user.TgUserID)
 }
 
+// clearUserState clears the user's current state
+func (b *Bot) clearUserState(userID int64) {
+	b.userStatesMutex.Lock()
+	delete(b.userStates, userID)
+	b.userStatesMutex.Unlock()
+}
+
 func (b *Bot) handleTextMessage(message *tgbotapi.Message) {
 	// Get user for language
 	user, _ := store.GetOrCreateUser(b.db, message.From.ID, message.From.UserName)
@@ -253,43 +260,59 @@ func (b *Bot) handleTextMessage(message *tgbotapi.Message) {
 		return
 	}
 
-	// Check if user is in custom deposit state
-	b.userStatesMutex.RLock()
-	userState, hasState := b.userStates[message.From.ID]
-	b.userStatesMutex.RUnlock()
-	
-	if hasState && userState == "awaiting_deposit_amount" {
-		// Handle custom deposit amount
-		b.handleCustomDepositAmount(message)
-		return
-	}
-	
-	// Check against localized button texts
+	// Check against localized button texts first to allow users to exit deposit state
 	switch message.Text {
 	case b.msg.Get(lang, "btn_buy"), "Buy", "购买":
+		// Clear user state when switching to other functions
+		b.clearUserState(message.From.ID)
 		b.handleBuy(message)
 		return
 	case b.msg.Get(lang, "btn_deposit"), "Deposit", "充值":
+		// Clear user state when accessing deposit menu
+		b.clearUserState(message.From.ID)
 		b.handleDeposit(message)
 		return
 	case b.msg.Get(lang, "btn_profile"), "Profile", "个人信息":
+		// Clear user state when switching to other functions
+		b.clearUserState(message.From.ID)
 		b.handleProfile(message)
 		return
 	case b.msg.Get(lang, "btn_orders"), "Orders", "My Orders", "我的订单":
+		// Clear user state when switching to other functions
+		b.clearUserState(message.From.ID)
 		logger.Info("Handling my orders request", "user_id", user.ID)
 		b.handleMyOrders(message)
 		return
 	case b.msg.Get(lang, "btn_faq"), "FAQ", "常见问题":
+		// Clear user state when switching to other functions
+		b.clearUserState(message.From.ID)
 		b.handleFAQ(message)
 		return
 	case b.msg.Get(lang, "btn_support"), "Support", "客服支持":
+		// Clear user state when switching to other functions
+		b.clearUserState(message.From.ID)
 		b.handleSupportButton(message)
 		return
 	case "/language":
+		// Clear user state when switching to other functions
+		b.clearUserState(message.From.ID)
 		b.handleLanguageSelection(message)
 		return
 	case "/ticket", "/support", "客服":
+		// Clear user state when switching to other functions
+		b.clearUserState(message.From.ID)
 		b.handleSupportCommand(message)
+		return
+	}
+
+	// Check if user is in custom deposit state (after checking button texts)
+	b.userStatesMutex.RLock()
+	userState, hasState := b.userStates[message.From.ID]
+	b.userStatesMutex.RUnlock()
+
+	if hasState && userState == "awaiting_deposit_amount" {
+		// Handle custom deposit amount
+		b.handleCustomDepositAmount(message)
 		return
 	}
 
@@ -852,7 +875,13 @@ func (b *Bot) handleDepositCallback(callback *tgbotapi.CallbackQuery) {
 		b.userStates[callback.From.ID] = "awaiting_deposit_amount"
 		b.userStatesMutex.Unlock()
 		
-		msg := tgbotapi.NewMessage(callback.Message.Chat.ID, b.msg.Get(lang, "custom_amount_instruction"))
+		customMsg := b.msg.Get(lang, "custom_amount_instruction")
+		if customMsg == "custom_amount_instruction" {
+			customMsg = "请输入您要充值的金额（例如：30）"
+		}
+		customMsg += "\n\n💡 发送 /cancel 或点击其他按钮可取消操作"
+
+		msg := tgbotapi.NewMessage(callback.Message.Chat.ID, customMsg)
 		b.api.Send(msg)
 		b.api.Request(tgbotapi.NewCallback(callback.ID, ""))
 		return
@@ -1113,11 +1142,39 @@ func (b *Bot) handleCustomDepositAmount(message *tgbotapi.Message) {
 	
 	// Parse amount from message
 	amountStr := strings.TrimSpace(message.Text)
+
+	// Check if user wants to cancel
+	if amountStr == "/cancel" || amountStr == "取消" || amountStr == "cancel" {
+		// Clear state and show main menu
+		b.clearUserState(message.From.ID)
+
+		// Create reply keyboard with localized buttons
+		keyboard := tgbotapi.NewReplyKeyboard(
+			tgbotapi.NewKeyboardButtonRow(
+				tgbotapi.NewKeyboardButton(b.msg.Get(lang, "btn_buy")),
+				tgbotapi.NewKeyboardButton(b.msg.Get(lang, "btn_deposit")),
+			),
+			tgbotapi.NewKeyboardButtonRow(
+				tgbotapi.NewKeyboardButton(b.msg.Get(lang, "btn_profile")),
+				tgbotapi.NewKeyboardButton(b.msg.Get(lang, "btn_orders")),
+			),
+			tgbotapi.NewKeyboardButtonRow(
+				tgbotapi.NewKeyboardButton(b.msg.Get(lang, "btn_faq")),
+				tgbotapi.NewKeyboardButton(b.msg.Get(lang, "btn_support")),
+			),
+		)
+
+		msg := tgbotapi.NewMessage(message.Chat.ID, "✅ 已取消充值操作，请选择其他功能")
+		msg.ReplyMarkup = keyboard
+		b.api.Send(msg)
+		return
+	}
+
 	amount, err := strconv.ParseFloat(amountStr, 64)
 	if err != nil || amount <= 0 {
-		msg := tgbotapi.NewMessage(message.Chat.ID, "❌ 请输入有效的金额，例如：30")
+		msg := tgbotapi.NewMessage(message.Chat.ID, "❌ 请输入有效的金额，例如：30\n\n💡 发送 /cancel 取消操作")
 		b.api.Send(msg)
-		
+
 		// Set state again to allow retry
 		b.userStatesMutex.Lock()
 		b.userStates[message.From.ID] = "awaiting_deposit_amount"
@@ -1130,20 +1187,20 @@ func (b *Bot) handleCustomDepositAmount(message *tgbotapi.Message) {
 	
 	// Check minimum and maximum limits
 	if amountCents < 100 { // Minimum $1
-		msg := tgbotapi.NewMessage(message.Chat.ID, "❌ 最低充值金额为 1 元")
+		msg := tgbotapi.NewMessage(message.Chat.ID, "❌ 最低充值金额为 1 元\n\n💡 发送 /cancel 取消操作")
 		b.api.Send(msg)
-		
+
 		// Set state again to allow retry
 		b.userStatesMutex.Lock()
 		b.userStates[message.From.ID] = "awaiting_deposit_amount"
 		b.userStatesMutex.Unlock()
 		return
 	}
-	
+
 	if amountCents > 1000000 { // Maximum $10,000
-		msg := tgbotapi.NewMessage(message.Chat.ID, "❌ 最高充值金额为 10,000 元")
+		msg := tgbotapi.NewMessage(message.Chat.ID, "❌ 最高充值金额为 10,000 元\n\n💡 发送 /cancel 取消操作")
 		b.api.Send(msg)
-		
+
 		// Set state again to allow retry
 		b.userStatesMutex.Lock()
 		b.userStates[message.From.ID] = "awaiting_deposit_amount"
