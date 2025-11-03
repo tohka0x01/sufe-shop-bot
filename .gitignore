@@ -74,3 +74,8 @@ backups/
 
 # Test artifacts
 test_callback
+
+# Claude-related files
+.claude/
+.claude.*
+*.claude
