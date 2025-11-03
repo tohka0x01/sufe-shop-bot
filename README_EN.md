@@ -281,7 +281,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Contact
 
 - GitHub Issues: [Submit Issue](https://github.com/Shannon-x/sufe-shop-bot/issues)
-- Email: your-email@example.com
 
 ---
 

@@ -279,7 +279,6 @@ go build -ldflags "-s -w" -o shopbot cmd/server/main.go
 ## 📞 联系方式
 
 - GitHub Issues: [提交问题](https://github.com/Shannon-x/sufe-shop-bot/issues)
-- Email: your-email@example.com
 
 ---
 
