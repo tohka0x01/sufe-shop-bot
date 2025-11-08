@@ -10,6 +10,25 @@
 
 一个功能完善的 Telegram 电商机器人系统，专门用于数字商品（充值卡、会员卡、激活码等）的自动化销售。支持多语言、多支付方式、完整的后台管理系统。
 
+
+<!-- Sponsor / Ad -->
+<div align="center">
+  <a href="https://sufe.pro">
+    <img src="https://img.sufe.me/file/1760201136357_isufe_icon.webp" alt="苏菲家宽" width="140">
+  </a>
+
+  <h3>苏菲家宽 · 极度纯净的家宽代理</h3>
+  <p>
+    为 Telegram Bot 回调、Webhook、管理后台、跨境业务等场景提供
+    <b>稳定、干净、低延迟</b> 的家宽出口。<br/>
+    多地区线路可选 · 支持独享/共享 · 可选静态 IP · 覆盖 IPv4/IPv6
+  </p>
+
+  <p><b>👉 立即访问：</b> <a href="https://sufe.pro">sufe.pro</a></p>
+</div>
+
+
+
 ## 🌟 核心功能
 
 ### 商城功能
@@ -284,7 +303,23 @@ go build -ldflags "-s -w" -o shopbot cmd/server/main.go
 - GitHub Issues: [提交问题](https://github.com/Shannon-x/sufe-shop-bot/issues)
 
 ---
-[<img src="https://img.sufe.me/file/1760201136357_isufe_icon.webp" alt="苏菲家宽" height="28" />](https://sufe.pro)
-**苏菲家宽** — 提供极度纯净的家宽代理  
-👉 [sufe.pro](https://sufe.pro)
+
 **注意**：使用本项目前，请确保遵守 Telegram 的服务条款和当地法律法规。
+
+<table>
+<tr>
+<td width="160" valign="middle" align="center">
+  <a href="https://sufe.pro">
+    <img src="https://img.sufe.me/file/1760201136357_isufe_icon.webp" alt="苏菲家宽" width="140">
+  </a>
+</td>
+<td valign="middle">
+
+**苏菲家宽** — 极度纯净的家宽代理  
+为 Telegram Bot / Webhook / 管理后台提供 **稳定、干净、低延迟** 的家宽网络出口。  
+• 多地区线路可选　• 独享/共享灵活选择　• 静态 IP 可选　• IPv4/IPv6 支持  
+
+**👉 立刻访问： [sufe.pro](https://sufe.pro)**
+</td>
+</tr>
+</table>
