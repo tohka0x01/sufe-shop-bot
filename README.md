@@ -5,6 +5,9 @@
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](docker-compose.yml)
 [![Telegram Bot API](https://img.shields.io/badge/Telegram%20Bot%20API-v5.5.1-blue.svg)](https://core.telegram.org/bots/api)
 
+> [<img src="https://img.sufe.me/file/1760201136357_isufe_icon.webp" alt="苏菲家宽" height="20" />](https://sufe.pro)
+> **苏菲家宽** — 提供极度纯净的家宽代理： [sufe.pro](https://sufe.pro)
+
 一个功能完善的 Telegram 电商机器人系统，专门用于数字商品（充值卡、会员卡、激活码等）的自动化销售。支持多语言、多支付方式、完整的后台管理系统。
 
 ## 🌟 核心功能
