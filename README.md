@@ -284,5 +284,7 @@ go build -ldflags "-s -w" -o shopbot cmd/server/main.go
 - GitHub Issues: [提交问题](https://github.com/Shannon-x/sufe-shop-bot/issues)
 
 ---
-
+[<img src="https://img.sufe.me/file/1760201136357_isufe_icon.webp" alt="苏菲家宽" height="28" />](https://sufe.pro)
+**苏菲家宽** — 提供极度纯净的家宽代理  
+👉 [sufe.pro](https://sufe.pro)
 **注意**：使用本项目前，请确保遵守 Telegram 的服务条款和当地法律法规。
