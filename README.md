@@ -19,9 +19,9 @@
 
   <h3>苏菲家宽 · 极度纯净的家宽代理</h3>
   <p>
-    为 Telegram Bot 回调、Webhook、管理后台、跨境业务等场景提供
+    为 AI使用、跨境业务等场景提供
     <b>稳定、干净、低延迟</b> 的家宽出口。<br/>
-    多地区线路可选 · 支持独享/共享 · 可选静态 IP · 覆盖 IPv4/IPv6
+    多地区线路可选  · 可选静态/动态 IP · 覆盖 IPv4/IPv6
   </p>
 
   <p><b>👉 立即访问：</b> <a href="https://sufe.pro">sufe.pro</a></p>
@@ -316,8 +316,8 @@ go build -ldflags "-s -w" -o shopbot cmd/server/main.go
 <td valign="middle">
 
 **苏菲家宽** — 极度纯净的家宽代理  
-为 Telegram Bot / Webhook / 管理后台提供 **稳定、干净、低延迟** 的家宽网络出口。  
-• 多地区线路可选　• 独享/共享灵活选择　• 静态 IP 可选　• IPv4/IPv6 支持  
+提供 **稳定、干净、低延迟** 的家宽网络出口。  
+• 多地区线路可选　• 独享/共享灵活选择　• 静态/动态 IP 可选　• IPv4/IPv6 支持  
 
 **👉 立刻访问： [sufe.pro](https://sufe.pro)**
 </td>
